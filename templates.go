@@ -14,10 +14,18 @@ const htmlTemplate = `<!DOCTYPE html>
             <h1>{{.Title}}</h1>
         </div>
 
+        <div class="search-container">
+            <form class="search-form" id="searchForm">
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск по ID (например: ВЗИС.421321.028)" required>
+                <button type="submit" class="search-button">Найти</button>
+            </form>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
         <div class="breadcrumb">
             {{range $i, $part := .Breadcrumb}}
                 {{if $i}} / {{end}}
-                <a href="{{$part.Path}}">{{$part.Name}}</a>
+                <a href="/browse{{$part.Path}}">{{$part.Name}}</a>
             {{end}}
         </div>
         
@@ -28,7 +36,7 @@ const htmlTemplate = `<!DOCTYPE html>
                 <ul class="file-list">
                     {{range .Data.Directories}}
                     <li class="file-item directory">
-                        <a href="/{{.RelativePath}}" class="file-link">
+                        <a href="/browse/{{.RelativePath}}" class="file-link">
                             <div class="file-info">
                                 <div class="file-name">📁 {{.Name}}</div>
                             </div>
@@ -45,7 +53,7 @@ const htmlTemplate = `<!DOCTYPE html>
                 <ul class="file-list">
                     {{range .Data.Files}}
                      <li class="file-item">
-                        <a href="/{{.RelativePath}}" class="file-link" target="_blank">
+                        <a href="/browse/{{.RelativePath}}" class="file-link" target="_blank">
                             <div class="file-info">
                                 <div class="file-name">{{.Name}}</div>
                                 <div class="file-details">
@@ -76,5 +84,6 @@ const htmlTemplate = `<!DOCTYPE html>
             {{end}}
         </div>
     </div>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>` 
