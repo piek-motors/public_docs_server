@@ -53,7 +53,6 @@ func (di *DocumentIndex) StartIndexing(rootPath string) {
 }
 // scanDocuments scans the directory recursively and indexes documents
 func (di *DocumentIndex) scanDocuments(rootPath string) {
-	log.Printf("Starting document index scan for: %s", rootPath)
 	di.mu.Lock()
 	defer di.mu.Unlock()
 	// Clear existing index
@@ -86,7 +85,6 @@ func (di *DocumentIndex) scanDocuments(rootPath string) {
 		return
 	}
 	di.lastScan = time.Now()
-	log.Printf("Document index scan completed. Found %d unique document IDs", len(di.documents))
 }
 
 // SearchDocuments searches for documents by ID

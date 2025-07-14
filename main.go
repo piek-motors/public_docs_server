@@ -40,12 +40,14 @@ type Server struct {
 	port        string
 	docIndex    *DocumentIndex
 }
+
 func NewServer() *Server {
 	return &Server{
 		port:     ":8080",
 		docIndex: NewDocumentIndex(),
 	}
 }
+
 func (s *Server) initialize() error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	if len(os.Args) > 1 {
@@ -67,6 +69,7 @@ func (s *Server) initialize() error {
 	s.docIndex.StartIndexing(s.scannedPath)
 	return nil
 }
+
 func (s *Server) setupRoutes(r *gin.Engine) {
 	r.Static("/static", "./static")
 	r.GET("/", func(c *gin.Context) {
@@ -75,6 +78,7 @@ func (s *Server) setupRoutes(r *gin.Engine) {
 	r.GET("/api/search", s.handleDocumentSearch)
 	r.GET("/browse/*path", s.handleBrowse)
 }
+
 func (s *Server) handleBrowse(c *gin.Context) {
 	requestedPath := c.Param("path")
 	if strings.HasPrefix(requestedPath, "/static/") {
@@ -124,9 +128,11 @@ func (s *Server) handleBrowse(c *gin.Context) {
 		log.Printf("Error executing template: %v", err)
 	}
 }
+
 func (s *Server) isPathAllowed(path string) bool {
 	return strings.HasPrefix(path, s.scannedPath)
 }
+
 func (s *Server) serveFile(c *gin.Context, fullPath string) error {
 	info, err := os.Stat(fullPath)
 	if err != nil {
@@ -143,6 +149,7 @@ func (s *Server) serveFile(c *gin.Context, fullPath string) error {
 	c.File(fullPath)
 	return nil
 }
+
 func (s *Server) scanDirectory(dirPath string) (*DirectoryData, error) {
 	absPath, err := filepath.Abs(dirPath)
 	if err != nil {
@@ -183,6 +190,7 @@ func (s *Server) scanDirectory(dirPath string) (*DirectoryData, error) {
 		ScanTime:    time.Now(),
 	}, nil
 }
+
 func (s *Server) validateDirectory(absPath string) error {
 	info, err := os.Stat(absPath)
 	if err != nil {
@@ -193,6 +201,7 @@ func (s *Server) validateDirectory(absPath string) error {
 	}
 	return nil
 }
+
 func (s *Server) createFileInfo(path string, d fs.DirEntry) (FileInfo, error) {
 	relPath, err := filepath.Rel(s.scannedPath, path)
 	if err != nil {
@@ -218,6 +227,7 @@ func (s *Server) createFileInfo(path string, d fs.DirEntry) (FileInfo, error) {
 	}
 	return fileInfo, nil
 }
+
 func (s *Server) sortFileLists(files []FileInfo, directories []FileInfo) {
 	sort.Slice(directories, func(i, j int) bool {
 		return directories[i].Name < directories[j].Name
@@ -226,6 +236,7 @@ func (s *Server) sortFileLists(files []FileInfo, directories []FileInfo) {
 		return files[i].Name < files[j].Name
 	})
 }
+
 func (s *Server) getRelativePath(absPath string) string {
 	relPath, _ := filepath.Rel(s.scannedPath, absPath)
 	if relPath == "." {
@@ -233,6 +244,7 @@ func (s *Server) getRelativePath(absPath string) string {
 	}
 	return relPath
 }
+
 func (s *Server) canViewFile(ext string) bool {
 	viewableExtensions := map[string]bool{
 		".pdf":  true,
@@ -243,12 +255,14 @@ func (s *Server) canViewFile(ext string) bool {
 	}
 	return viewableExtensions[ext]
 }
+
 func (s *Server) run() error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	s.setupRoutes(r)
 	return r.Run(s.port)
 }
+
 func main() {
 	server := NewServer()
 	if err := server.initialize(); err != nil {
@@ -262,6 +276,7 @@ type BreadcrumbPart struct {
 	Name string
 	Path string
 }
+
 func (s *Server) createBreadcrumb(path string) []BreadcrumbPart {
 	var parts []BreadcrumbPart
 	parts = append(parts, BreadcrumbPart{Name: "Главная", Path: "/"})
@@ -275,6 +290,7 @@ func (s *Server) createBreadcrumb(path string) []BreadcrumbPart {
 	}
 	return parts
 }
+
 func (s *Server) handleDocumentSearch(c *gin.Context) {
 	query := c.Query("id")
 	if query == "" {
